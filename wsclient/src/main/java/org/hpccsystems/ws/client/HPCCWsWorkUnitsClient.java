@@ -1223,12 +1223,12 @@ public class HPCCWsWorkUnitsClient extends DataSingleton
             }
             catch (InterruptedException e)
             {
-                e.printStackTrace();
+            	throw new MonitorTimeoutException("Connection interrupted while waiting for WUID " + wu.getWuid() + " to complete.",wu.getWuid(),e);
             }
 
             timerTickCount++;
             if (timerTickCount * wu.getSleepMillis() > wu.getMaxMonitorMillis())
-                throw new Exception("Timed out waiting for WUID " + wu.getWuid() + " to complete.");
+                throw new MonitorTimeoutException("Timed out waiting for WUID " + wu.getWuid() + " to complete.",wu.getWuid());
 
             try
             {
@@ -1246,7 +1246,7 @@ public class HPCCWsWorkUnitsClient extends DataSingleton
             }
             catch (Exception e)
             {
-                throw new Exception("Error attempting to refresh WU " + wu.getWuid());
+                throw new MonitorTimeoutException("Error attempting to refresh WU " + wu.getWuid(),wu.getWuid(),e);
             }
         }
     }
