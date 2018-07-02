@@ -18,7 +18,7 @@ public class DFUDataColumnInfo extends DFUDataColumn
     private String                  xmlDefaultVal    = null;
     private String                  maxcount         = null;
     private String                  maxlength        = null;
-    private boolean                 blob             = false;
+    private boolean                 isblob             = false;
     private List<DFUDataColumnAnnotation> annotations = new ArrayList<DFUDataColumnAnnotation>();
 
     /**
@@ -192,10 +192,10 @@ public class DFUDataColumnInfo extends DFUDataColumn
     }
     
     public boolean isBlob() {
-        return blob;
+        return isblob;
     }
 
     public void setBlob(boolean blob) {
-        this.blob = blob;
+        this.isblob = blob;
     }
 }

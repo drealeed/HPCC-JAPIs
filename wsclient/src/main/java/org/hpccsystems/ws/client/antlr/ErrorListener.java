@@ -66,43 +66,42 @@ public class ErrorListener extends BaseErrorListener
 
     private String getErrorMessage(Recognizer<?, ?> recognizer, RecognitionException e, int line, int charPositionInLine, Object offendingSymbol)
     {
-        String msg = "GENERAL_PARSE_ERROR";
+        StringBuilder msgstr=new StringBuilder();
        
         if (e instanceof InputMismatchException)
         {
             InputMismatchException ime = (InputMismatchException) e;
             String expected = ime.getExpectedTokens().toString(recognizer.getVocabulary());
-            msg = "MISMATCHED_TOKEN " + e.getOffendingToken().getText() + " , expected one of " + expected;
+            msgstr.append("MISMATCHED_TOKEN ").append(e.getOffendingToken().getText()).append(" , expected one of ").append(expected);
         }
         else if (e instanceof NoViableAltException)
         {
-            msg = "NO_PARSE_ALTERNATIVE," + getTokenErrorDisplay(e.getOffendingToken());
+            msgstr.append("NO_PARSE_ALTERNATIVE,").append(getTokenErrorDisplay(e.getOffendingToken()));
         }
         else if (e instanceof LexerNoViableAltException)
         {
-            msg = "NO_PARSE_ALTERNATIVE," + getTokenErrorDisplay(e.getOffendingToken());
+            msgstr.append("NO_PARSE_ALTERNATIVE,").append(getTokenErrorDisplay(e.getOffendingToken()));
         }
         else if (e instanceof FailedPredicateException)
         {
             FailedPredicateException fpe = (FailedPredicateException) e;
-            msg = "FAILED_PARSE_PREDICATE," + recognizer.getRuleNames()[fpe.getRuleIndex()] + "," + fpe.getPredicate();
+            msgstr.append("FAILED_PARSE_PREDICATE,").append(recognizer.getRuleNames()[fpe.getRuleIndex()]).append(",").append(fpe.getPredicate());
         }
         else
         {
-            msg = "GENERAL_PARSE_ERROR," + e.getMessage();
+            msgstr.append("GENERAL_PARSE_ERROR,").append(e.getMessage());
         }
-        String loc = "";
+        StringBuilder loc = new StringBuilder("");
         if (e.getOffendingToken() != null)
         {
-            loc = " at line " + e.getOffendingToken().getLine() + ", char " + e.getOffendingToken().getCharPositionInLine() + "-"
-                    + e.getOffendingToken().getCharPositionInLine()
-                    + (e.getOffendingToken().getStopIndex() - e.getOffendingToken().getStartIndex()) ;
+            loc.append(" at line ").append( e.getOffendingToken().getLine()).append(", char ").append(e.getOffendingToken().getCharPositionInLine()).append("-")
+                    .append(e.getOffendingToken().getCharPositionInLine())
+                    .append(e.getOffendingToken().getStopIndex() - e.getOffendingToken().getStartIndex()) ;
             
         } else {
-            loc=" at line " + line + ", char " + charPositionInLine;
+            loc.append(" at line ").append(line).append(", char ").append(charPositionInLine);
         }
-        msg=msg + loc;
-        return msg;
+        return msgstr.toString() + loc.toString();        
     }
 
     private String getTokenErrorDisplay(Token t)

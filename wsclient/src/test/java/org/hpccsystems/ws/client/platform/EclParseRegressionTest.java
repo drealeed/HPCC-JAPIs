@@ -1,3 +1,10 @@
+/*******************************************************************************
+ * Copyright (c) 2011 HPCC Systems. All rights reserved. This program and the accompanying materials are made available
+ * under the terms of the Eclipse Public License v1.0 which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors: HPCC Systems - initial API and implementation
+ ******************************************************************************/
 package org.hpccsystems.ws.client.platform;
 
 import static org.junit.Assert.fail;
@@ -24,7 +31,7 @@ public class EclParseRegressionTest  {
 
     Logger logger=Logger.getLogger(this.getClass().getName());
 
-    boolean reset=false;
+    boolean reset=true;
 
     Platform p=null;
     
@@ -34,7 +41,7 @@ public class EclParseRegressionTest  {
     List<String> alreadytested=new ArrayList<String>();
     List<String> failedrecs=new ArrayList<String>();
     public String getIP() {
-        return "10.241.100.159";
+        return "";
     }
     
     public int getPort() {
@@ -45,11 +52,11 @@ public class EclParseRegressionTest  {
         return "http";
     }
     public String getUsername() {
-        return "dleed";
+        return "";
     }
     
     public String getPassword() {
-        return System.getenv("hpccpassword");
+        return "";
     }
     
     public Platform getPlatform() throws Exception
@@ -85,7 +92,8 @@ public class EclParseRegressionTest  {
 
     @Test
     public void testSingle() throws Exception {
-        String fname="temp::kel::kelotto::email::result";
+  //      String fname=".::lrenn:edit-ma-test";
+        String fname="anthem::enc_wpt_edw_provider_thor_superfile";
         DFUFileDetailInfo info=getDFUClient().getFileDetails(fname, null);
         EclRecordInfo rec=DFUFileDetailInfo.getRecordFromECL(info.getEcl());
         if (rec.getParseErrors().size()>0) {
@@ -153,7 +161,7 @@ public class EclParseRegressionTest  {
             }
             if (file.getIsSuperfile()) {
                 alreadytested.add(fullfilename);
-                continue;
+            //    continue;
             }
             if (file.getFileName().contains("::key::") || file.getFileName().contains("::keys::") || file.getFileName().startsWith("keys::") || file.getFileName().startsWith("key::")) {
                 alreadytested.add(fullfilename);
