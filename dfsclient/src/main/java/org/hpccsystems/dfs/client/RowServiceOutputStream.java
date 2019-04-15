@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.io.OutputStream;
 
 import javax.net.SocketFactory;
@@ -47,7 +48,7 @@ public class RowServiceOutputStream extends OutputStream
     private ByteBuffer           scratchBuffer                 = ByteBuffer.allocate(SCRATCH_BUFFER_LEN);
 
     RowServiceOutputStream(String ip, int port, String accessToken, FieldDef recordDef, int filePartIndex, String filePartPath,
-            CompressionAlgorithm fileCompression) throws Exception
+            CompressionAlgorithm fileCompression,Boolean useSSL) throws Exception
     {
         this.rowServiceIP = ip;
         this.rowServicePort = port;
@@ -57,7 +58,6 @@ public class RowServiceOutputStream extends OutputStream
         this.accessToken = accessToken;
         this.compressionAlgo = fileCompression;
 
-        boolean useSSL = false;
         try
         {
             if (useSSL)
@@ -160,7 +160,11 @@ public class RowServiceOutputStream extends OutputStream
         int status = this.scratchBuffer.getInt();
         if (status != RFCCodes.RFCStreamNoError)
         {
-            throw new IOException("Row service returned error code: " + status + ". Aborting");
+            String msg=new String(scratchBuffer.array(),StandardCharsets.UTF_8);
+            if (msg.length()>8) {
+                msg=msg.substring(8);
+            }            
+            throw new IOException("Row service returned error code: " + status + ":" + msg + " Aborting");
         }
 
         this.handle = this.scratchBuffer.getInt();

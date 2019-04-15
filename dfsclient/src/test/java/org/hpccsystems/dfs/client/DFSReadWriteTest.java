@@ -47,6 +47,10 @@ public class DFSReadWriteTest
 
     private static final String   clusterIP      = "192.168.56.101";
     private static final String[] datasets       = { "~benchmark::integer::20kb", "~demo::example_dataset" };
+    //private static final String   clusterIP      = "10.173.147.1";
+    //private static final String[] datasets       = { "~angurbala::out", "~demo::salesdata" };
+    //private static final int[]    expectedCounts = { 1, 3270 };
+    
     private static final int[]    expectedCounts = { 1250, 6 };
     // private static final String[] datasets = {"~benchmark::integer::20kb"};
     // private static final int[]    expectedCounts = {1250};
@@ -206,7 +210,7 @@ public class DFSReadWriteTest
 
             String clusterName = "mythor";
             System.out.println("Create Start");
-            DFUCreateFileWrapper createResult = dfuClient.createFile(fileName, clusterName, eclRecordDefn, 300);
+            DFUCreateFileWrapper createResult = dfuClient.createFile(fileName, clusterName, eclRecordDefn, 300,false);
             System.out.println("Create Finished");
 
             DFUFilePartWrapper[] dfuFileParts = createResult.getFileParts();
@@ -234,7 +238,7 @@ public class DFSReadWriteTest
 
                 HPCCRecordAccessor recordAccessor = new HPCCRecordAccessor(recordDef);
                 HPCCRemoteFileWriter<HPCCRecord> fileWriter = new HPCCRemoteFileWriter<HPCCRecord>(hpccPartitions[partitionIndex], recordDef,
-                        recordAccessor, CompressionAlgorithm.NONE);
+                        recordAccessor, CompressionAlgorithm.NONE,false);
                 try
                 {
                     for (int j = 0; j < numRecordsInPartition; j++, currentRecord++)

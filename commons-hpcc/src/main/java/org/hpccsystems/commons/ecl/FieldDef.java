@@ -247,6 +247,9 @@ public class FieldDef implements Serializable
      */
     public int getNumDefs()
     {
+        if (this.defs==null) {
+            return 0;
+        }
         return this.defs.length;
     }
 

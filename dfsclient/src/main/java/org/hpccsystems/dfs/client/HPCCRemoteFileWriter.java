@@ -45,7 +45,8 @@ public class HPCCRemoteFileWriter<T>
      * @param projectedRD
      *            the requested record format
      */
-    public HPCCRemoteFileWriter(DataPartition dp, FieldDef recordDef, IRecordAccessor recordAccessor, CompressionAlgorithm fileCompression)
+    public HPCCRemoteFileWriter(DataPartition dp, FieldDef recordDef, IRecordAccessor recordAccessor, 
+            CompressionAlgorithm fileCompression,Boolean useSSL)
             throws Exception
     {
         this.recordDef = recordDef;
@@ -54,7 +55,7 @@ public class HPCCRemoteFileWriter<T>
 
         this.outputStream = new RowServiceOutputStream(this.dataPartition.getCopyIP(0), this.dataPartition.getPort(),
                 this.dataPartition.getFileAccessBlob(), this.recordDef, this.dataPartition.getThisPart(), this.dataPartition.getCopyPath(0),
-                fileCompression);
+                fileCompression,useSSL);
 
         this.binaryRecordWriter = new BinaryRecordWriter(this.outputStream);
         this.binaryRecordWriter.initialize(this.recordAccessor);
