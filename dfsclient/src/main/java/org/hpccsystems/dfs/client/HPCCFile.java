@@ -33,6 +33,7 @@ import org.hpccsystems.commons.ecl.HpccSrcType;
 import org.hpccsystems.commons.ecl.RecordDefinitionTranslator;
 import org.hpccsystems.commons.errors.HpccFileException;
 import org.hpccsystems.ws.client.HPCCWsDFUClient;
+import org.hpccsystems.ws.client.gen.wsdfu.v1_51.DFUFileType;
 import org.hpccsystems.ws.client.utils.Connection;
 import org.hpccsystems.ws.client.wrappers.wsdfu.DFUFileAccessInfoWrapper;
 
@@ -246,6 +247,9 @@ public class HPCCFile implements Serializable
         try
         {
             fileinfoforread = fetchReadFileInfo(fileName, dfuClient, fileAccessExpirySecs, targetfilecluster);
+            if (fileinfoforread.getFileType() != DFUFileType.Flat)
+                throw new Exception("Cannont stream file '" + fileName + "' - File type: '" +  fileinfoforread.getFileType().toString() + "' not supported!");
+
             originalRecDefInJSON = fileinfoforread.getRecordTypeInfoJson();
             if (originalRecDefInJSON == null)
             {
@@ -255,8 +259,8 @@ public class HPCCFile implements Serializable
         }
         catch (Exception e)
         {
-            log.error("Encountered invalid record definition: '" + originalRecDefInJSON + "' error: " + e.getMessage());
-            throw new HpccFileException("Bad definition", e);
+            log.error("Unable to retrieve file or record information: " + e.getMessage());
+            throw new HpccFileException("Unable to retrieve file or record information: " + e.getMessage(), e);
         }
 
         try

@@ -242,10 +242,18 @@ public class BinaryRecordReader implements IRecordReader
         }
         catch (Exception e)
         {
-            throw new HpccFileException("Failed to parse next record", e);
+            throw new HpccFileException("Failed to parse next record: " + e.getMessage(), e);
         }
 
         return record;
+    }
+   
+    /**
+     * Returns the number of bytes available to read immediately.
+     */
+    public int getAvailable() throws IOException
+    {
+        return this.inputStream.available();
     }
 
     /**
@@ -290,7 +298,7 @@ public class BinaryRecordReader implements IRecordReader
                     intValue = getUnsigned((int) fd.getDataLen(), fd.getSourceType() == HpccSrcType.LITTLE_ENDIAN);
                     if (intValue < 0)
                     {
-                        throw new UnparsableContentException("Integer overflow. Max 8 byte integer value: " + Long.MAX_VALUE);
+                        log.warn("Detected possible unsigned value overflow in field '" + fd.getFieldName() + "'. Ensure proper value interpretation");
                     }
                 }
                 else

@@ -35,6 +35,7 @@ public class FieldDef implements Serializable
     private long              len                = 0;
     private boolean           fixedLength        = false;
     private boolean           isUnsigned         = false;
+    private int               additionalFlags    = 0;
 
     /**
      * @param rhs
@@ -50,6 +51,7 @@ public class FieldDef implements Serializable
         this.len = rhs.len;
         this.fixedLength = rhs.fixedLength;
         this.isUnsigned = rhs.isUnsigned;
+        this.additionalFlags = rhs.additionalFlags;
     }
 
     /**
@@ -63,27 +65,58 @@ public class FieldDef implements Serializable
      *            the field length
      * @param isFixedLength
      *            len may be non-zero and variable
-     * @param defs
-     *            the array of fields composing this def
+     * @param isUnsigned
+     *            Only applies to integers and decimal fields. Ignored otherwise
+     * @param HpccSrcType
+     *            Field encoding type. Primairly applies to strings. Non-strings should use LITTLE_ENDIAN.
+     * @param childDefs
+     *            Child field defs. Only used for Records, Sets & Datasets. Sets & Dataset should have a single child. Null otherwise.
      */
     public FieldDef(String fieldName, FieldType fieldType, String typeName, long len, boolean isFixedLength,
-            boolean isUnsigned, HpccSrcType styp, FieldDef[] defs)
+            boolean isUnsigned, HpccSrcType sourceType, FieldDef[] childDefs)
+    {
+        this(fieldName, fieldType, typeName, len, isFixedLength, isUnsigned, 0, sourceType, childDefs);
+    }
+
+    /**
+     * @param fieldName
+     *            the name of the field
+     * @param fieldType
+     *            the FieldType value
+     * @param typeName
+     *            the name of this composite type
+     * @param len
+     *            the field length
+     * @param isFixedLength
+     *            len may be non-zero and variable
+     * @param isUnsigned
+     *            Only applies to integers and decimal fields. Ignored otherwise
+     * @param additionalFlags 
+     *            Additional flags. Primarily used to retain layout information in HPCC records during conversion. 
+     * @param HpccSrcType
+     *            Field encoding type. Primairly applies to strings. Non-strings should use LITTLE_ENDIAN.
+     * @param childDefs
+     *            Child field defs. Only used for Records, Sets & Datasets. Sets & Dataset should have a single child. Null otherwise.
+     */
+    public FieldDef(String fieldName, FieldType fieldType, String typeName, long len, boolean isFixedLength,
+            boolean isUnsigned, int additionalFlags, HpccSrcType sourceType, FieldDef[] childDefs)
     {
         this.fieldName = fieldName;
         this.fieldType = fieldType;
         this.typeName = typeName;
-        this.defs = defs;
+        this.additionalFlags = additionalFlags;
+        this.defs = childDefs;
         if (this.defs == null)
         {
             this.defs = new FieldDef[0];
         }
 
-        this.srcType = styp;
+        this.srcType = sourceType;
         this.fixedLength = isFixedLength;
         this.isUnsigned = isUnsigned;
         this.len = len;
 
-        if (this.fieldType == FieldType.VAR_STRING && (styp.isUTF16() == false && styp != HpccSrcType.SINGLE_BYTE_CHAR))
+        if (this.fieldType == FieldType.VAR_STRING && (sourceType.isUTF16() == false && sourceType != HpccSrcType.SINGLE_BYTE_CHAR))
         {
             throw new IllegalArgumentException("Invalid field defintion for: " + fieldName
                     + "VarStrings must be encoded in either UTF16 or ASCII");
@@ -255,6 +288,26 @@ public class FieldDef implements Serializable
     }
 
     /**
+     * Get the additional flags for this fields.
+     * 
+     * @return
+     */
+    public int getAdditionalFlags()
+    {
+        return this.additionalFlags;
+    }
+
+    /**
+     * Set the additional flags for this fields.
+     * 
+     * @return
+     */
+    public void setAdditionalFlags(int flags)
+    {
+        this.additionalFlags = flags;
+    }
+
+    /**
      * Number of field definitions. Zero if this is not a record
      *
      * @return number
@@ -289,6 +342,7 @@ public class FieldDef implements Serializable
         }
 
         this.defs = childDefs;
+        updateRecordMeta(this);
     }
 
     /**
@@ -314,5 +368,71 @@ public class FieldDef implements Serializable
             }
         };
         return rslt;
+    }
+
+    private static void updateRecordMeta(FieldDef recordDef)
+    {
+        updateRecordMinLength(recordDef);
+    }
+
+    private static void updateRecordMinLength(FieldDef recordDef)
+    {
+        for (int i = 0; i < recordDef.getNumDefs(); i++)
+        {
+            FieldDef childDef = recordDef.getDef(i);
+            if (childDef.getFieldType() == FieldType.RECORD)
+            {
+                updateRecordMinLength(childDef);
+            }
+        }
+
+        long minDataLength = getMinLengthInBytes(recordDef);
+        recordDef.setDataLen(minDataLength);
+    }
+
+    private static long getMinLengthInBytes(FieldDef def)
+    {
+        switch (def.getFieldType())
+        {
+            case RECORD:
+            {
+                long minDataLength = 0;
+                for (int i = 0; i < def.getNumDefs(); i++)
+                {
+                    FieldDef childDef = def.getDef(i);
+                    minDataLength += getMinLengthInBytes(childDef);
+                }
+                return minDataLength;
+            }
+            case SET:
+            {
+                // Sets include 4 byte integer dataLength and an additional byte
+                return 5;
+            }
+            default:
+            {
+                long dataLength = 0;
+                if (def.isFixed())
+                {
+                    // Var strings can be fixed length
+                    dataLength = def.getDataLen();
+                    if (def.getFieldType() == FieldType.VAR_STRING)
+                    {
+                        dataLength++;
+                    }
+                    
+                    // Unicode datalength is in code points not bytes
+                    if (def.getSourceType().isUTF16())
+                    {
+                        dataLength *= 2;
+                    }
+                }
+                else
+                {
+                    dataLength = 4;
+                }
+                return dataLength;
+            }
+        }
     }
 }
