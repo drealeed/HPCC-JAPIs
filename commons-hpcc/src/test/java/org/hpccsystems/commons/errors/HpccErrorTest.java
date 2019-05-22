@@ -17,11 +17,11 @@ public class HpccErrorTest
     {
         // create a standard error message
         HpccError err = new HpccError(HpccErrorLevel.ERROR, HpccErrorType.SYSTEM, HpccErrorCode.UNCAUGHT_EXCEPTION,
-                "Error retrieving x");
+                "Sample junit Error retrieving x");
 
         // create a standard warning message
         err = new HpccError(HpccErrorLevel.WARNING, HpccErrorType.SYSTEM, HpccErrorCode.UNCAUGHT_EXCEPTION,
-                "warning retrieving x");
+                "Sample junit warning retrieving x");
 
         // create a standard info message
         err = new HpccError(HpccErrorLevel.INFO, HpccErrorType.SYSTEM, HpccErrorCode.INFO, "info about retrieving x");
@@ -39,7 +39,7 @@ public class HpccErrorTest
 
         // create an error for an ecl compile exception (with linenum/colnum, etc)
         err = new HpccError(HpccErrorLevel.ERROR, HpccErrorType.UNKNOWN, HpccErrorCode.UNCAUGHT_EXCEPTION,
-                "error message", "additional info", 31, // line number
+                "sample junit error message", "additional info", 31, // line number
                 342, // column number
                 "c:/test/compmod.ecl" // filename
         );
@@ -55,14 +55,14 @@ public class HpccErrorTest
     {
         HpccErrorBlock eb = new HpccErrorBlock();
         eb.add(new HpccError(HpccErrorLevel.ERROR, HpccErrorType.SYSTEM, HpccErrorCode.UNCAUGHT_EXCEPTION,
-                "Error retrieving x"));
+                "Sample junit Error retrieving x"));
         eb.add(new HpccError(HpccErrorLevel.WARNING, HpccErrorType.SYSTEM, HpccErrorCode.UNCAUGHT_EXCEPTION,
-                "warning retrieving x"));
+                "Sample junit warning retrieving x"));
         eb.add(new HpccError(HpccErrorLevel.INFO, HpccErrorType.SYSTEM, HpccErrorCode.INFO, "info about retrieving x"));
 
         try
         {
-            throw new Exception("test exception");
+            throw new Exception("Sample junit test exception");
         }
         catch (Exception e)
         {
@@ -71,7 +71,7 @@ public class HpccErrorTest
         }
 
         eb.add(new HpccError(HpccErrorLevel.ERROR, HpccErrorType.UNKNOWN, HpccErrorCode.UNCAUGHT_EXCEPTION,
-                "error message", "additional info", 31, // line number
+                "Sample junit error message", "additional info", 31, // line number
                 342, // column number
                 "c:/test/compmod.ecl" // filename
         ));
