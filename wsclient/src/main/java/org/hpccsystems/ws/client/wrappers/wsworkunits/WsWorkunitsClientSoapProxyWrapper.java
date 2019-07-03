@@ -274,6 +274,6 @@ public class WsWorkunitsClientSoapProxyWrapper
     {
         return platformVersion.major==7
                 && (platformVersion.minor==0
-                || platformVersion.minor==2);
+                || platformVersion.minor>=2);
     }
 }
