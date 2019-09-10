@@ -16,6 +16,11 @@ public class WsWorkunitsServiceSoapProxy implements org.hpccsystems.ws.client.ge
   private void _initWsWorkunitsServiceSoapProxy() {
     try {
       wsWorkunitsServiceSoap = (new org.hpccsystems.ws.client.gen.wsworkunits.v1_74.WsWorkunitsLocator()).getWsWorkunitsServiceSoap();
+      org.apache.axis.client.Stub stub = (org.apache.axis.client.Stub) wsWorkunitsServiceSoap;
+
+      stub._setProperty(org.apache.axis.client.Call.CONNECTION_TIMEOUT_PROPERTY, 100000); 
+      stub._setProperty(org.apache.axis.components.net.DefaultCommonsHTTPClientProperties.CONNECTION_DEFAULT_CONNECTION_TIMEOUT_KEY, 100000); 
+      stub._setProperty(org.apache.axis.components.net.DefaultCommonsHTTPClientProperties.CONNECTION_DEFAULT_SO_TIMEOUT_KEY, 100000);
       if (wsWorkunitsServiceSoap != null) {
         if (_endpoint != null)
           ((javax.xml.rpc.Stub)wsWorkunitsServiceSoap)._setProperty("javax.xml.rpc.service.endpoint.address", _endpoint);

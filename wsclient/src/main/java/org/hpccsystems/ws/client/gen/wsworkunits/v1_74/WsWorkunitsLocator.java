@@ -54,6 +54,7 @@ public class WsWorkunitsLocator extends org.apache.axis.client.Service implement
         try {
             org.hpccsystems.ws.client.gen.wsworkunits.v1_74.WsWorkunitsServiceSoapStub _stub = new org.hpccsystems.ws.client.gen.wsworkunits.v1_74.WsWorkunitsServiceSoapStub(portAddress, this);
             _stub.setPortName(getWsWorkunitsServiceSoapWSDDServiceName());
+            _stub.setTimeout(100000);
             return _stub;
         }
         catch (org.apache.axis.AxisFault e) {

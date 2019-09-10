@@ -2422,6 +2422,7 @@ public class HPCCWsWorkUnitsClient extends DataSingleton
         {
             params.setPageStartFrom(new NonNegativeInteger(String.valueOf(pageStartFrom)));
         }
+        params.setCheckAllNodes(false);
         params.setDescending(descending);
         params.setClusterName(clustername);
         params.setQuerySetName(querysetname);
@@ -2429,6 +2430,7 @@ public class HPCCWsWorkUnitsClient extends DataSingleton
         params.setQueryID(queryid);
         params.setActivated(activated);
         params.setFileName(filename);
+        params.setSortby("Id");
         WUListQueriesResponse resp = getSoapProxy().WUListQueries(params);
         throwWsWUExceptions(resp.getExceptions(), "Could not fetch queries: ");
         QuerySetQuery[] queries = resp.getQuerysetQueries();
